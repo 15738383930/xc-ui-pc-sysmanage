@@ -13,7 +13,9 @@
       页面别名：
       <el-input v-model="params.pageAliase" style="width: 100px"></el-input>
       <el-button type="primary" v-on:click="query" size="small">查询</el-button>
-      <router-link class="mui-tab-item" :to="{path:'/cms/page/add/'}">
+      <router-link class="mui-tab-item" :to="{path:'/cms/page/add/',
+        query: {page: this.params.page, siteId: this.params.siteId}
+      }">
         <el-button type="primary" size="small">新增页面</el-button>
       </router-link>
     </el-form>
@@ -32,6 +34,14 @@
       </el-table-column>
       <el-table-column prop="pageCreateTime" label="创建时间" width="180">
       </el-table-column>
+      <el-table-column label="操作" width="80">
+        <template slot-scope="page">
+          <el-button size="small" type="text" @click="edit(page.row.pageId)">编辑</el-button>
+          <el-button size="small" type="text" @click="del(page.row.pageId)">删除</el-button>
+          <el-button @click="preview(page.row.pageId)" type="text" size="small">页面预览</el-button>
+        </template>
+      </el-table-column>
+
     </el-table>
     <el-pagination
       layout="prev, pager, next"
@@ -45,22 +55,28 @@
 </template>
 <script>
     import * as cmsApi from '../api/cms'
+
     export default {
-        mounted(){
+        created() {
+            let _this = this;
+            _this.params.page = Number.parseInt(this.$route.query.page || 1);
+            _this.params.siteId = this.$route.query.siteId || '';
+        },
+        mounted() {
             // DOM元素渲染完成后调用
-          this.query();
-          this.site();
+            this.query();
+            this.site();
         },
         data() {
             return {
                 siteList: [],
                 list: [],
-                total:0,
-                params:{
-                    siteId:'',
-                    pageAliase:'',
-                    page:1,//页码
-                    size:10//每页显示个数
+                total: 0,
+                params: {
+                    siteId: '',
+                    pageAliase: '',
+                    page: 1,//页码
+                    size: 10//每页显示个数
                 }
             }
         },
@@ -72,16 +88,39 @@
             },
             query: function () {
                 let _this = this;
-                cmsApi.page_list(_this.params.page, _this.params.size, _this.params).then((res)=>{
+                cmsApi.page_list(_this.params.page, _this.params.size, _this.params).then((res) => {
                     _this.list = res.queryResult.list;
                     _this.total = res.queryResult.total;
                 })
             },
             site: function () {
                 let _this = this;
-                cmsApi.site_all().then((res)=>{
+                cmsApi.site_all().then((res) => {
                     _this.siteList = res.queryResult.list;
                 })
+            },
+            edit: function (id) {
+                let _this = this;
+                _this.$router.push({
+                    path: '/cms/page/edit/' + id
+                })
+            },
+            del: function (id) {
+                let _this = this;
+                _this.$confirm('确认删除吗？', '提示', {}).then(() => {
+                    cmsApi.page_del(id).then((res) => {
+                        if (res.success) {
+                            _this.$message.success('删除成功');
+                            this.query();
+                        } else {
+                            _this.$message.error('删除失败');
+                        }
+                    });
+                });
+            },
+            //页面预览
+            preview(pageId){
+                window.open("http://www.zhou.com/cms/preview/" + pageId);
             }
         }
     }

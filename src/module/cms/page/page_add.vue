@@ -137,6 +137,12 @@
             });
           }
         });
+      },
+      site: function () {
+          let _this = this;
+          cmsApi.site_all().then((res)=>{
+              _this.siteList = res.queryResult.list;
+          })
       }
     },
     created: function () {
@@ -145,16 +151,8 @@
     mounted:function(){
 
       //初始化站点列表
-      this.siteList = [
-        {
-          siteId:'5a751fab6abb5044e0d19ea1',
-          siteName:'门户主站'
-        },
-        {
-          siteId:'102',
-          siteName:'测试站'
-        }
-      ]
+      this.site();
+
       //模板列表
       this.templateList = [
         {
