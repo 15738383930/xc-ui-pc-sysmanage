@@ -28,6 +28,15 @@ module.exports = {
         }
         //target: 'http://127.0.0.1:50201'
 
+      },
+      // node.js转发服务：以/api/cms请求的路径，都转发到以下服务器
+      '/test/vue': {
+        target: 'http://localhost:3333',
+        pathRewrite: {
+
+        }
+        //target: 'http://127.0.0.1:50201'
+
       }
       /*,
       '/ucenter': {
