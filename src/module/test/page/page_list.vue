@@ -21,6 +21,11 @@
         prop="age"
         label="年龄">
       </el-table-column>
+      <el-table-column label="操作" width="80">
+        <template slot-scope="page">
+          <el-button size="small" type="text" @click="edit(page.row.id)">编辑</el-button>
+        </template>
+      </el-table-column>
     </el-table>
     <el-pagination
       background
@@ -64,6 +69,12 @@
         cmsApi.page_list(_this.params.page, _this.params.size, _this.params).then((res)=>{
           _this.list = res.queryResult.list;
           _this.total = res.queryResult.total;
+        })
+      },
+      edit: function (id) {
+        let _this = this;
+        _this.$router.push({
+          path: '/test/page/edit/' + id
         })
       }
     }
